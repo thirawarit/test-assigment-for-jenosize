@@ -1,0 +1,12 @@
+notebook
+tqdm
+numpy
+pandas
+matplotlib
+torch
+torchvision
+torchaudio
+transformers
+datasets
+isort
+huggingface-hub[cli]
