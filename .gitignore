@@ -1,4 +1,4 @@
-# Ignore all hidden files and directories.
+# Ignore all hidden files and directories, except .gitignore.
 .*
 !.gitignore
 
