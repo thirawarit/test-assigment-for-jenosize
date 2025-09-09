@@ -1,0 +1,6 @@
+# Ignore all hidden files and directories.
+.*
+!.gitignore
+
+# Ignore my private jupyter-notebook.
+*/private-*.ipynb

@@ -10,3 +10,4 @@ transformers
 datasets
 isort
 huggingface-hub[cli]
+beautifulsoup4
