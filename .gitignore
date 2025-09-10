@@ -3,4 +3,7 @@
 !.gitignore
 
 # Ignore my private files.
-*/private-*
+**/private-*
+
+# Ignore all pycache
+**/__pycache__
