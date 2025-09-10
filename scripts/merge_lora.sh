@@ -1,12 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 
-MODEL_NAME="Qwen/Qwen2-VL-7B-Instruct"
-# MODEL_NAME="Qwen/Qwen2-VL-2B-Instruct"
+MODEL_NAME="Qwen/Qwen3-8B"
 
 export PYTHONPATH=src:$PYTHONPATH
 
-python src/merge_lora_weights.py \
-    --model-path /home/workspace/Qwen2-VL-Finetune/output/testing_lora \
+python ./src/merge_lora_weights.py \
+    --model-path ./output/testing_lora \
     --model-base $MODEL_NAME  \
-    --save-model-path /home/workspace/Qwen2-VL-Finetune/output/merge_test \
+    --save-model-path ./output/merge_test \
     --safe-serialization
