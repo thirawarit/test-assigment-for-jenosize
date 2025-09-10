@@ -59,7 +59,7 @@ def get_tokenize_qwen(conversations: List[Dict[str, str]], tokenizer: PreTrained
             content = conversation["value"]
             system_message = [{"role": roles.get(role, role),  "content": content}]
 
-    system_prompt: str = tokenizer.apply_chat_template(system_message, tokenize=False)
+    system_prompt: str = tokenizer.apply_chat_template(system_message, tokenize=False, enable_thinking=False)
     package_prompt = []
     for idx, conversation in enumerate(conversations):
         try:
@@ -70,13 +70,13 @@ def get_tokenize_qwen(conversations: List[Dict[str, str]], tokenizer: PreTrained
             content = conversation["value"]
         
         if roles.get(role, role) == "user":
-            human_prompt = tokenizer.apply_chat_template([{"role": roles.get(role, role), "content": content}], tokenize=False, add_generation_prompt=True)
+            human_prompt = tokenizer.apply_chat_template([{"role": roles.get(role, role), "content": content}], tokenize=False, add_generation_prompt=True, enable_thinking=False)
             # human_prompt = human_prompt[len(default_system_message):]
             package_prompt.append((system_prompt + human_prompt) if idx == 0 else human_prompt)
             # manual write prompt no use template
 
         elif roles.get(role, role) == "assistant":
-            gpt_prompt = tokenizer.apply_chat_template([{"role": roles.get(role, role), "content": content}], tokenize=False)
+            gpt_prompt = tokenizer.apply_chat_template([{"role": roles.get(role, role), "content": content}], tokenize=False, enable_thinking=False)
             prefix_gpt_prompt = IM_START_TOKEN + roles.get(role, role) + "\n"
             gpt_prompt = gpt_prompt[len(prefix_gpt_prompt):]
             package_prompt.append(gpt_prompt)
