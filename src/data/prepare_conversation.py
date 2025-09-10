@@ -29,6 +29,10 @@ logger = logging.getLogger(__name__)
 
 def generate_conversation(dataset: List[Dict[str, Any]], save_path: Union[str | Path]):
 
+    system_prompt = (
+        "You are a helpful assistant."
+    )
+
     instruction_prompt = (
         "* Analyse the given article. \n"
         "* Create articles about trends and future ideas for businesses as a markdown format \n"
@@ -62,6 +66,10 @@ def generate_conversation(dataset: List[Dict[str, Any]], save_path: Union[str | 
             d = json.loads(d)
 
         conversations = []
+
+        system = {'from': 'system', 'value': system_prompt}
+        conversations.append(system)
+        
         human = {'from': 'human', 'value': instruction_prompt.format(**d)}
         conversations.append(human)
 
