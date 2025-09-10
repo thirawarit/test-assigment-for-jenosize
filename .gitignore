@@ -2,5 +2,5 @@
 .*
 !.gitignore
 
-# Ignore my private jupyter-notebook.
-*/private-*.ipynb
+# Ignore my private files.
+*/private-*
