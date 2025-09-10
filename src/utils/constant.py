@@ -1,0 +1,2 @@
+IGNORE_INDEX = -100
+IM_START_TOKEN = "<|im_start|>"

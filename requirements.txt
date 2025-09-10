@@ -12,3 +12,9 @@ isort
 huggingface-hub[cli]
 beautifulsoup4
 selenium
+trl
+bitsandbytes
+deepspeed
+peft
+openai
+vllm
