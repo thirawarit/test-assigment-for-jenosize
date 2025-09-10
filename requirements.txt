@@ -11,3 +11,4 @@ datasets
 isort
 huggingface-hub[cli]
 beautifulsoup4
+selenium
