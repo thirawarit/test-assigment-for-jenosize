@@ -131,7 +131,7 @@ def make_supervised_data_module(tokenizer, data_args, model_id: str = None):
     sft_dataset = SupervisedDataset(
         data_path=data_args.data_path, tokenizer=tokenizer, data_args=data_args
     )
-    data_collator = DataCollatorForSupervisedDataset(pad_token_id=tokenizer.tokenizer.pad_token_id)
+    data_collator = DataCollatorForSupervisedDataset(pad_token_id=tokenizer.pad_token_id)
 
     return dict(train_dataset=sft_dataset,
                 eval_dataset=None,
