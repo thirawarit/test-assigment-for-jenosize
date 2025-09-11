@@ -1,4 +1,5 @@
 notebook
+isort
 tqdm
 numpy
 pandas
@@ -6,18 +7,20 @@ matplotlib
 torch
 torchvision
 torchaudio
+wheel
 transformers
 datasets
-isort
+accelerate
+bitsandbytes
+peft
+deepspeed
 huggingface-hub[cli]
 beautifulsoup4
 selenium
 trl
-bitsandbytes
-deepspeed
-peft
 openai
-vllm
-accelerate
+vllm    ; python_version >= "3.11"
 tensorboardX
 jinja2
+
+fastapi[standard]

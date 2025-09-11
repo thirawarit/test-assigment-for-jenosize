@@ -11,7 +11,7 @@
 # Setup Instructions
 
 ## Prerequisites
-*   Required `Python 3.10+`
+*   Required `Python 3.11+`
 *   Optional required a code editor (suggest `vscode`)
 ---
 
