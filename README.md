@@ -52,7 +52,7 @@ The input dataset must contain the following keys for each item:
     "target_audience": ["Teachers", "Students"], 
     "website": "https://example.com", 
     "seo_keywords": ["AI trends", "future of education"], 
-    "content": "Artificial intelligence is transforming how students learn in classrooms."}
+    "content": "# Artificial intelligence is transforming how students learn in classrooms ..."}
 ```
 
 ## Usage
