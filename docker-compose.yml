@@ -9,3 +9,9 @@ services:
     volumes:
       - $HF_HOME:/Caches
     restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            capabilities: [gpu]
