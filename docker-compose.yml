@@ -1,0 +1,11 @@
+services:
+  jns-gen-article-thirawarit:
+    build: .
+    environment:
+      - HF_HOME=/Caches
+      - HUGGING_FACE_HUB_TOKEN=${HUGGING_FACE_HUB_TOKEN}
+    ports:
+      - "80:12999"
+    volumes:
+      - $HF_HOME:/Caches
+    restart: unless-stopped
