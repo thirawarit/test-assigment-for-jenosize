@@ -1,3 +1,5 @@
+# Depend on your device, please check: https://hub.docker.com/r/nvidia/cuda/tags
+# Find your cuda versio with cuda:xx.x.x-(devel-)ubuntu22.04
 FROM nvidia/cuda:12.8.0-devel-ubuntu22.04
 
 # System deps
