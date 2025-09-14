@@ -30,25 +30,6 @@ pip install -r requirements.txt
 
 This pipeline scrapes articles, cleans the content, and outputs a structured JSON ready for fine-tuning.
 
----
-
-Before that,
-
----
-
-## Model Selection Rationale
-
-After reviewing research papers, public benchmarks, and experimenting with multiple models of different sizes, I shortlisted several candidates: **Google Gemma3**, **OpenAI GPT models**, and **Qwen3-8B**.  
-
-I selected **Qwen3-8B** for fine-tuning because it provides an optimal balance between model quality and computational efficiency.  
-
-- Compared to **Google’s Gemma3**, it is lighter and faster to fine-tune while still producing competitive text generation quality.  
-- Unlike **OpenAI GPT models**, Qwen3 is fully open-source, enabling local fine-tuning and GPU-based deployment without vendor lock-in.  
-
-This makes **Qwen3-8B** a practical and cost-effective choice for building the prototype.
-
----
-
 ### Step 1: Build the Data Pipeline
 
 1. Open the Jupyter Notebook (`.ipynb`) and select the kernel you created (e.g., `jenosize_interview/.venv`).
@@ -131,6 +112,23 @@ python -m src.data.prepare_conversation \
 ---
 
 ## 3. Fine-Tuning Instructions
+
+Before we go to the steps,
+
+---
+
+## Model Selection Rationale
+
+After reviewing research papers, public benchmarks, and experimenting with multiple models of different sizes, I shortlisted several candidates: **Google Gemma3**, **OpenAI GPT models**, and **Qwen3-8B**.  
+
+I selected **Qwen3-8B** for fine-tuning because it provides an optimal balance between model quality and computational efficiency.  
+
+- Compared to **Google’s Gemma3**, it is lighter and faster to fine-tune while still producing competitive text generation quality.  
+- Unlike **OpenAI GPT models**, Qwen3 is fully open-source, enabling local fine-tuning and GPU-based deployment without vendor lock-in.  
+
+This makes **Qwen3-8B** a practical and cost-effective choice for building the prototype.
+
+---
 
 1. Configure parameters in `scripts/finetune.sh`, including:
 
