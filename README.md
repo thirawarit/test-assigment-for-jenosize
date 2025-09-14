@@ -117,7 +117,7 @@ Before we go to the steps,
 
 ---
 
-## Model Selection Rationale
+### Model Selection Rationale
 
 After reviewing research papers, public benchmarks, and experimenting with multiple models of different sizes, I shortlisted several candidates: **Google Gemma3**, **OpenAI GPT models**, and **Qwen3-8B**.  
 
