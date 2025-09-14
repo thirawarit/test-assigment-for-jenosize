@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# You can use 1B instead of 8B
+# You can use 1.7B instead of 8B
 MODEL_NAME="Qwen/Qwen3-8B"
 
 # export CUDA_VISIBLE_DEVICES=1,2 # Optional

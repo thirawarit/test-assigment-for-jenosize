@@ -1,34 +1,58 @@
-# Submission Requirements:
-1.  A zipped folder or GitHub repository containing:
-    * All code files (model fine-tuning, data pipeline, API deployment).
-    * Dataset used for fine-tuning (or a link if sourced externally).
-    * README file with setup instructions.
-2.  A short report (1-2 pages) explaining your approach, challenges faced, and potential improvements.
-3.  A Link to test App prototype as a user.
+# Jenosize Pipeline & FastAPI Service
+
+This repository provides tools to **scrape, preprocess, fine-tune, and deploy** content for LLMs, including a containerized FastAPI service for inference.
 
 ---
 
-## Prerequisites
+## 1. Prerequisites
 
-*   Required `Python 3.11+`
-*   Optional required a code editor (suggest `vscode`)
+Before starting, make sure you have:
+
+* **Python 3.11+**
+* Optional: a code editor (recommended: `VSCode`)
+* **Chrome** or another browser supported by Selenium
+* **Docker & Docker Daemon** (for FastAPI deployment)
+* **NVIDIA GPUs** and NVIDIA Container Toolkit (for GPU acceleration in Docker)
 
 ---
 
-# Preparation conversation
+You need to create a virtual environment and install dependencies:
 
-## Input Format
+```bash
+python3.10 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-The input dataset must contain the following keys for each item:
+---
+
+## 2. Data Pipeline & Preprocessing
+
+This pipeline scrapes articles, cleans the content, and outputs a structured JSON ready for fine-tuning.
+
+### Step 1: Build the Data Pipeline
+
+1. Open the Jupyter Notebook (`.ipynb`) and select the kernel you created (e.g., `jenosize_interview/.venv`).
+2. Follow the notebook steps to scrape and process articles.
+
+**Output File:**
+
+```
+./datasets/jenosize-article-mockup.json
+```
+
+### Input Format
+
+Each item in the JSON should have the following keys:
 
 * `topic_category`
 * `industry`
 * `target_audience`
 * `website`
 * `seo_keywords`
-* `content` (It is `labels`)
+* `content` (used as labels)
 
-### Example `.json`
+**Example JSON:**
 
 ```json
 [
@@ -38,12 +62,12 @@ The input dataset must contain the following keys for each item:
     "target_audience": ["Teachers", "Students"],
     "website": "https://example.com",
     "seo_keywords": ["AI trends", "future of education"],
-    "content": "# Artificial intelligence is transforming how students learn in classrooms ..."
+    "content": "# Artificial intelligence is transforming how students learn ..."
   }
 ]
 ```
 
-### Example `.jsonl`
+**Example JSONL (one conversation per line):**
 
 ```json
 {
@@ -52,53 +76,28 @@ The input dataset must contain the following keys for each item:
     "target_audience": ["Teachers", "Students"], 
     "website": "https://example.com", 
     "seo_keywords": ["AI trends", "future of education"], 
-    "content": "# Artificial intelligence is transforming how students learn in classrooms ..."}
-```
-
-## Usage
-
-Run the script from the command line:
-
-```bash
-python prepare_conversation.py --input-path <INPUT_FILE> --save-path <OUTPUT_FILE>
-```
-
-### Arguments
-
-* `--input-path`
-  Path to the input dataset file. Must be `.json` or `.jsonl`.
-
-* `--save-path`
-  Path to save the processed conversations. Must be `.json` or `.jsonl`.
-
----
-
-## Example
-
-Convert a JSON dataset to JSONL conversations:
-
-```bash
-python prepare_conversation.py \
-    --input-path ./datasets/raw.json \
-    --save-path ./datasets/train/train_conversations.jsonl
-```
-
-Convert a JSONL dataset to JSON:
-
-```bash
-python prepare_conversation.py \
-    --input-path ./datasets/raw.jsonl \
-    --save-path ./datasets/train/train_conversations.json
+    "content": "# Artificial intelligence is transforming how students learn ..."
+}
 ```
 
 ---
 
-## Output
+### Step 2: Prepare Conversations for Fine-Tuning
 
-* If `--save-path` ends with `.jsonl`, output will contain one conversation per line.
-* If `--save-path` ends with `.json`, output will be a list of conversations in a single JSON file.
+Run the following command:
 
-Each conversation follows the structure:
+```bash
+python -m src.data.prepare_conversation \
+    --input-path ./datasets/jenosize-article-mockup.json \
+    --save-path ./datasets/train/train-conversations.jsonl
+```
+
+**Arguments:**
+
+* `--input-path`: Path to input dataset file (`.json` or `.jsonl`).
+* `--save-path`: Path to save processed conversations (`.json` or `.jsonl`).
+
+**Output Structure:**
 
 ```json
 {
@@ -112,83 +111,80 @@ Each conversation follows the structure:
 
 ---
 
-# Setup Instructions
+## 3. Fine-Tuning Instructions
 
-1.  Create your virtual environment. Activate the venv and install dependent libraries.
-```bash
-python3.10 -m venv .venv # Optional to change your venv name (".venv")
-source .venv/bin/activate # You must change ".venv" here also, if you changed it previously.
-pip install -r requirements.txt
-```
+1. Configure parameters in `scripts/finetune.sh`, including:
 
-**NOTE:** If you need to exit from this venv, you can use:
-```bash
-deactivate
-``` 
+* `MODEL_NAME` (LLM model from Hugging Face)
+* `GLOBAL_BATCH_SIZE`, `BATCH_PER_DEVICE`, `NUM_DEVICES`
+* Checkpoint naming, output directories, and DeepSpeed settings
 
----
+2. Run fine-tuning:
 
-2. Open the file `scripts/finetune.sh` and configure the parameters as needed.
-Default settings in the file are shown below:
-```bash
-MODEL_NAME="Qwen/Qwen3-8B"  # LLM model you selected from Hugging Face
-
-GLOBAL_BATCH_SIZE=128
-BATCH_PER_DEVICE=2          # Batch size per GPU
-NUM_DEVICES=2               # Number of GPUs to use for fine-tuning
-GRAD_ACCUM_STEPS=$((GLOBAL_BATCH_SIZE / (BATCH_PER_DEVICE * NUM_DEVICES)))
-CHECKPOINT_NAME='trial-qwen3-sft-jenosize-0_0_0b'   # Name for the fine-tuned model
-export PYTHONPATH=src:$PYTHONPATH
-
-mkdir -p ./output/output_logs
-
-deepspeed ./src/train/train_sft.py \
-    --deepspeed ./scripts/zero3.json \      # You can choose another DeepSpeed config if needed
-    --model_id $MODEL_NAME \
-    --data_path datasets/train/*.jsonl \    # Path to the training dataset
-    --remove_unused_columns False \
-    --freeze_llm False \
-    --bf16 True \
-    --fp16 False \
-    --disable_flash_attn2 False \
-    --output_dir ./output/${CHECKPOINT_NAME} \
-    --num_train_epochs 1 \                  # Number of training epochs
-    --per_device_train_batch_size $BATCH_PER_DEVICE \
-    --learning_rate 1e-5 \                  # Learning rate
-    --weight_decay 0.1 \
-    --warmup_ratio 0.03 \
-    --lr_scheduler_type "cosine" \
-    --logging_steps 1 \
-    --tf32 True \
-    --gradient_checkpointing True \
-    --report_to tensorboard \
-    --save_strategy "steps" \
-    --save_steps 200 \
-    --save_total_limit 10 \
-    --dataloader_num_workers 4 \
-        2>&1 | tee ./output/output_logs/history_log_${CHECKPOINT_NAME}.out
-```
-
----
-
-3. Run `scripts/finetune.sh`. Execute the following command:
 ```bash
 bash scripts/finetune.sh
 ```
-**NOTE:** When running fine-tuning from the terminal, it is common to use tools like `tmux` or `screen`. These allow you to keep the process running in the background even if your terminal session disconnects. We highly recommend learning to use them, as they are very helpful for long-running training jobs.
 
----
+**Notes:**
 
-4. All logs from the fine-tuning process are saved in:
+* Use `tmux` or `screen` to run long training sessions in the background.
+* Logs are saved in:
 
-```
+```txt
 ./output/output_logs/history_log_${CHECKPOINT_NAME}.out
 ```
 
-You can view them using any text editor, for example with `vim`:
+---
+
+## 4. Deploy with FastAPI
+
+This project includes a containerized FastAPI service optimized for NVIDIA GPUs and Hugging Face integration.
+
+### Step 1: Check GPU and CUDA version
 
 ```bash
-vim ./output/output_logs/history_log_${CHECKPOINT_NAME}.out
+nvidia-smi
 ```
+
+Select the appropriate CUDA base image in the `Dockerfile`.
+
+### Step 2: Create `.env` File
+
+```env
+HF_HOME=[your-hf-cache-directory]
+HUGGING_FACE_HUB_TOKEN=[your-hf-token]
+```
+
+### Step 3: Configure GPU Allocation
+
+Edit `docker-compose.yml`:
+
+```yaml
+...
+deploy:
+  resources:
+    reservations:
+      devices:
+      - driver: nvidia
+        capabilities: [gpu]
+        device_ids: ['0']   # Replace with your GPU IDs
+```
+
+### Step 4: Build and Run Container
+
+```bash
+sudo docker compose up --build
+sudo docker compose up --build -d   # Run in background
+```
+
+### Step 5: Access the Service
+
+FastAPI service will be available at:
+
+```
+http://localhost:80
+```
+
+(Default internal port `12999` is mapped to `80`)
 
 ---
